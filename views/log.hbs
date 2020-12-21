@@ -24,6 +24,9 @@
             title=$("#title"),
             action=$("#action");
 
+        var url = new URL(window.location.href);
+        var isTest = url.searchParams.get("test");
+
         function message(msg) {
             let style = "line-height: 36px; opacity: 1;";
             if (msg === "FAIL" || msg === "ERROR") {
@@ -97,7 +100,7 @@
                 }
             }, 1000);
 
-            $.post("/hello",{feel: feel, name: name, emoji: emoji}, function(data){
+            $.post("/log",{ feel: feel, name: name, emoji: emoji, test: isTest }, function(data){
                 setTimeout(function() {
                     clearInterval(intFn);
                     if(data === 'CREATED!') {

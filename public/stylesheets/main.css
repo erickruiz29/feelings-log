@@ -88,7 +88,8 @@ input[type="button"] {
 }
 
 input::placeholder {
-    font-size: 45pt;
+    font-size: 30pt;
+    letter-spacing: 16pt;
 }
 
 input[type="text"]:focus {

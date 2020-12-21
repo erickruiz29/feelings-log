@@ -19,9 +19,7 @@
 
 <script type="application/javascript">
     $(function (){
-        let user="erick2987499",
-            pass="wattupMan(*&987",
-            out = $("#response"),
+        let out = $("#response"),
             hints=$("#hints"),
             title=$("#title"),
             action=$("#action");
@@ -99,7 +97,7 @@
                 }
             }, 1000);
 
-            $.post("/hello",{user: user,pass: pass, feel: feel, name: name, emoji: emoji}, function(data){
+            $.post("/hello",{feel: feel, name: name, emoji: emoji}, function(data){
                 setTimeout(function() {
                     clearInterval(intFn);
                     if(data === 'CREATED!') {

@@ -2,6 +2,19 @@ var request = require('request');
 var express = require('express');
 var router = express.Router();
 
+let SpotifyWebApi = undefined;
+let spotifyApi = undefined
+var spotifyEnabled = process.env.SPOTIFY_API_ENABLED
+
+if (spotifyEnabled) {
+    SpotifyWebApi = require('spotify-web-api-node');
+    spotifyApi = new SpotifyWebApi({
+        clientId: process.env.SPOTIFY_CLIENT_ID,
+        clientSecret: process.env.SPOTIFY_CLIENT_SECERT,
+        redirectUri: process.env.SPOTIFY_REDIRECT_URI
+    });
+}
+
 var endpoint = process.env.POST_ENDPOINT
 
 /* GET home page. */
@@ -10,6 +23,20 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/feelings', function(req, res, next) {
+    console.log(spotifyEnabled)
+    if (spotifyEnabled && spotifyApi !== undefined) {
+        spotifyApi.getMyCurrentPlaybackState()
+            .then(function(data) {
+                // Output items
+                if (data.body && data.body.is_playing) {
+                    console.log("User is currently playing something!");
+                } else {
+                    console.log("User is not playing anything, or doing so in private.");
+                }
+            }, function(err) {
+                console.log('Something went wrong!', err);
+            });
+    }
   res.render('dingdong', { title: 'Feelings Log' });
 });
 

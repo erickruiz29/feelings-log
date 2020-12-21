@@ -50,9 +50,9 @@ router.post('/hello', function (req, res, next) {
            date.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles' });
 
     body["date"] = date;
-    request.post(endpoint, { json: body }, function(error, response, body){
-        console.log(body);
-        if(body.includes("event_created")) {
+    request.post(endpoint, { json: body }, function(error, response, resBody){
+        console.log(resBody);
+        if(resBody.includes("event_created")) {
           res.send("CREATED!")
         } else {
           res.send("NOT OKAY!")

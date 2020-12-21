@@ -1,6 +1,4 @@
-body {
-    width: 100%;
-}
+body {}
 
 body > div {
     margin: 60pt 0;
@@ -10,6 +8,11 @@ h1 {
     font-size: 45pt;
     text-align: center;
     letter-spacing: 5px;
+}
+
+.lightspaced {
+    font-weight: 320;
+    letter-spacing: 8pt;
 }
 
 #title {

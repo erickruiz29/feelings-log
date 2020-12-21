@@ -1,0 +1,129 @@
+<h1 id="title">How Are You Feeling?</h1>
+<h1 id="action" style="opacity: 0;">Sending...</h1>
+<div class="container">
+    <div id="hints">&nbsp;</div>
+    <div id="formContainer">
+        <form>
+            <input type="text" id="name" placeholder="(Your name)">
+            <input type="text" id="feel" placeholder="I'm feeling...">
+            <input type="text" id="emoji" placeholder="Emoji" maxlength="2">
+            <input type="hidden" id="user">
+            <input type="hidden" id="pass">
+        </form>
+    </div>
+</div>
+<div class="container response">
+    <div id="response" style="opacity: 0;">&nbsp;</div>
+</div>
+<div class="container"></div>
+
+<script type="application/javascript">
+    $(function (){
+        let user="erick2987499",
+            pass="wattupMan(*&987",
+            out = $("#response"),
+            hints=$("#hints"),
+            title=$("#title"),
+            action=$("#action");
+
+        function message(msg) {
+            let style = "line-height: 36px; opacity: 1;";
+            if (msg === "FAIL" || msg === "ERROR") {
+                style += "color: #d50000;";
+            }
+            out.attr("style", style);
+            out.text(msg);
+        }
+
+        function  loading() {
+            out.attr("style", "opacity: 1;");
+            const text = out.text() + "."
+            out.text(text)
+        }
+
+        function clear() {
+            out.attr("style", "opacity: 0;");
+            out.html("&nbsp;")
+        }
+
+        function reset(time) {
+            setTimeout(function() {
+                clear()
+                $("#name").val("")
+                $("#feel").val("")
+                $("#emoji").val("")
+                $("#formContainer").attr("")
+                $("form").attr("style", "")
+                hints.html("&nbsp;")
+                hints.attr("style", "")
+                action.attr("style", "opacity: 0;");
+                title.attr("style", "opacity: 1;");
+            }, time)
+        }
+
+        function transitionOut() {
+            $("#formContainer").attr("style","max-height: 0;");
+            $("form").attr("style", "opacity: 0;");
+            hints.attr("style", "opacity: 0;");
+            action.attr("style", "opacity: 1;");
+            title.attr("style", "opacity: 0;");
+        }
+
+        function updateText(msg) {
+            action.attr("style", "opacity: 0;")
+            message(msg)
+            reset(2500)
+        }
+
+        function submitForm(ev) {
+            ev.preventDefault();
+            clear();
+            transitionOut()
+
+            let name=$("#name").val(),
+                feel=$("#feel").val(),
+                emoji=$("#emoji").val();
+
+            if (name === "") {
+                name = "Erick"
+            }
+
+            let  maxTry = 0;
+            let intFn = setInterval(function() {
+                if (maxTry >= 20) {
+                    clearInterval(intFn);
+                    updateText("No service")
+                } else {
+                    maxTry += 1;
+                    loading()
+                }
+            }, 1000);
+
+            $.post("/hello",{user: user,pass: pass, feel: feel, name: name, emoji: emoji}, function(data){
+                setTimeout(function() {
+                    clearInterval(intFn);
+                    if(data === 'CREATED!') {
+                        updateText("Feeling saved")
+                    } else {
+                        updateText("No save")
+                    }
+                }, 2300)
+            });
+        }
+
+        $("input").keyup(function(ev) {
+            setTimeout(function() {
+                if ($("#feel").val().length > 0 || $("#emoji").val().length > 0) {
+                    hints.text("Press Enter to send");
+                    if (ev.keyCode === 13 || ev.which === 13) {
+                        submitForm(ev)
+                    }
+                } else {
+                    hints.html("&nbsp;")
+                }
+            }, 500);
+        });
+
+        $("form").submit(function(ev) { submitForm(ev) });
+    });
+</script>

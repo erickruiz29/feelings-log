@@ -1,0 +1,95 @@
+body {
+    width: 100%;
+}
+
+body > div {
+    margin: 60pt 0;
+}
+
+h1 {
+    font-size: 45pt;
+    text-align: center;
+    letter-spacing: 5px;
+}
+
+#title {
+    transition: opacity 150ms;
+}
+
+#action {
+    transition: opacity 300ms;
+}
+
+#action {
+    position: absolute;
+    top: 60pt;
+    margin: 0;
+    left: calc(50% - 280pt/2);
+    width: 300pt;
+}
+
+.container {
+    display: block;
+    margin: 0 auto;
+    width: 90%;
+    position: relative;
+    transition: opacity 1s;
+}
+
+.container.response {
+    margin: 20px auto;
+}
+
+#formContainer {
+    transition: opacity 750ms;
+}
+
+form {
+    transition: max-height 1000ms;
+}
+
+#hints {
+    color: #737374;
+    font-size: 20pt;
+    text-align: right;
+    width: 630pt;
+    transition: opacity 150ms;
+    margin: -10pt auto -30pt;
+}
+
+#response {
+    color: #333434;
+    font-size: 70pt;
+    text-align: center;
+    transition: opacity 300ms;
+    width: max-content;
+    display: block;
+    margin: 10px auto;
+}
+input {
+    border: none;
+    border-bottom: 5pt solid #b3b3b3;
+    padding: 20px 5px 20pt;
+    margin: 20pt auto 30pt auto;
+    display: block;
+    height: 40pt;
+    width: 630pt;
+    font-size: 60pt;
+}
+
+
+input[type="button"] {
+    background-color: #b3b3b3;
+    color: #333434;
+    height: 44px
+}
+
+input::placeholder {
+    font-size: 45pt;
+}
+
+input[type="text"]:focus {
+    border-bottom-color: #00B7FF;
+    outline: none;
+    box-shadow: none !important;
+}

@@ -32,7 +32,11 @@
             error={{{error}}},
             musicImgUrl={{{musicImgUrl}}},
             trackInfoUpdateNum = 0,
-            numTrackUpdates = 0;
+            numTrackUpdates = 0,
+            isSubmitting = false;
+
+        var url = new URL(window.location.href);
+        var isTest = url.searchParams.get("test");
 
         function zoomOutMobile() {
             var viewport = document.querySelector('meta[name="viewport"]');
@@ -71,7 +75,10 @@
                 console.log(numTrackUpdates);
                 console.log(trackData);
 
-                if (spotifyBtn === true) {
+                if (spotifyBtn === true || isSubmitting) {
+                    if (typeof callback === "function") {
+                        callback()
+                    }
                     return;
                 }
 
@@ -101,38 +108,35 @@
 
         function reset(time) {
             setTimeout(function() {
-                clear()
-                $("#name").val("")
-                $("#feel").val("")
-                $("#emoji").val("")
-                $("#formContainer").attr("")
-                $("form").attr("style", "")
-                hints.html("&nbsp;")
-                hints.attr("style", "")
-                action.attr("style", "opacity: 0;");
-                title.attr("style", "opacity: 1;");
-                zoomOutMobile();
+                resetFn()
             }, time)
+        }
+
+        function resetFn() {
+            isSubmitting = false
+            clear()
+            $("#name").val("")
+            $("#feel").val("")
+            $("#emoji").val("")
+            $("#formContainer").attr("")
+            $("form").attr("style", "")
+            hints.html("&nbsp;")
+            hints.attr("style", "")
+            action.attr("style", "opacity: 0;");
+            title.attr("style", "opacity: 1;");
+            zoomOutMobile();
         }
 
         function resetUpdateTrack(time) {
             setTimeout(function() {
                 updateTrackData(()=> {
-                    clear()
-                    $("#name").val("")
-                    $("#feel").val("")
-                    $("#emoji").val("")
-                    $("#formContainer").attr("")
-                    $("form").attr("style", "")
-                    hints.html("&nbsp;")
-                    hints.attr("style", "")
-                    action.attr("style", "opacity: 0;");
-                    title.attr("style", "opacity: 1;");
+                    resetFn()
                 });
             }, time)
         }
 
         function transitionOut() {
+            isSubmitting = true
             $("#formContainer").attr("style","max-height: 0;");
             music.attr("style", "opacity: 0;")
             $("form").attr("style", "opacity: 0;");
@@ -224,9 +228,6 @@
 
         function startApp() {
             reset(0);
-
-            var url = new URL(window.location.href);
-            var isTest = url.searchParams.get("test");
 
             if (authd !== "" && !spotifyBtn) {
                 hints.text(`${authd} has been authorized!`);

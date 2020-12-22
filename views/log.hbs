@@ -49,11 +49,18 @@
             auth.attr("style", "");
         }
 
-        if (currentMusic !== "") {
+        if (error !== "") {
+            music.append(`<h3>${error}</h3>`);
+            music.attr("style", "");
+        } else if (currentMusic === "No music playing") {
+            music.addClass("nomusic");
             music.append(`<img src="${musicImgUrl}"><h3>${currentMusic}</h3>`);
             music.attr("style", "");
-        } else if (error !== "") {
-            music.append(`<h3>${error}</h3>`);
+            setTimeout(() => {
+                music.attr("style", "opacity: 0;");
+            }, 2000)
+        } else if (currentMusic !== "") {
+            music.append(`<img src="${musicImgUrl}"><h3>${currentMusic}</h3>`);
             music.attr("style", "");
         }
 

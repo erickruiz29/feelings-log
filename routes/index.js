@@ -44,7 +44,7 @@ router.get('/', function(req, res, next) {
 });
 
 function getRelevantTrackData(callback) {
-    var trackData = {}
+    var trackData = undefined;
     if (spotifyEnabled && spotifyApi !== undefined && spotifyApi.getAccessToken() !== undefined) {
         spotifyApi.getMyCurrentPlayingTrack()
             .then(function(data) {
@@ -66,10 +66,14 @@ function getRelevantTrackData(callback) {
                     } else {
                         return trackData
                     }
+                } else {
+                    callback(trackData)
                 }
             }, function(err) {
                 return {error: `"Error with Spotify"`}
             });
+    } else {
+        callback(trackData)
     }
 }
 
@@ -83,24 +87,28 @@ router.get('/log', function(req, res, next) {
     var authd = req.query["authd"];
     authd = authd === undefined ? `""` : `"${authd}"`;
 
-    let spotifyBtnEnabled = false;
+    let spotifyBtnEnabled = spotifyEnabled;
     let currentMusic = `""`
     let args = { title: 'Feelings Log', test: req.get("test") === "true", authd: authd,
         spotifyBtnEnabled: spotifyBtnEnabled, currentMusic: currentMusic, error: `""`, musicImgUrl: `""`};
 
     if (spotifyEnabled && spotifyApi !== undefined && spotifyApi.getAccessToken() !== undefined) {
         getRelevantTrackData((trackData) => {
-            if (trackData.error) {
-                args.error = trackData.error;
+            if (trackData !== undefined) {
+                if (trackData.error) {
+                    args.error = trackData.error;
+                } else {
+                    args.currentMusic = `"${trackData.name} by ${trackData.artists[0].name}"`;
+                    args.musicImgUrl = `"${trackData.image.url}"`
+                    args.spotifyBtnEnabled = `false`;
+                }
             } else {
-                args.currentMusic = `"${trackData.name} by ${trackData.artists[0].name}"`;
-                args.musicImgUrl = `"${trackData.image.url}"`
-                args.spotifyBtnEnabled = `"false"`;
+                args.currentMusic = `"No music playing"`
+                args.spotifyBtnEnabled = `false`;
             }
             res.render('log', args);
         })
     } else {
-        args.spotifyBtnEnabled = `${spotifyEnabled}`
         res.render('log', args);
     }
 });
@@ -117,16 +125,19 @@ router.post('/log', function (req, res, next) {
 
     body["date"] = date;
 
-    request.post(reqUri, { json: body }, function(error, response, resBody){
-        console.log(resBody);
-        if(resBody.includes("event_created")) {
-          res.send("CREATED!")
-        } else {
-          res.send("NOT OKAY!")
-        }
-      });
+    getRelevantTrackData((trackData) => {
+        body.trackData = trackData
+        request.post(reqUri, { json: body }, function(error, response, resBody){
+            // console.log(resBody);
+            if(resBody.includes("event_created")) {
+                res.send("CREATED!")
+            } else {
+                res.send("NOT OKAY!")
+            }
+        });
+    })
 
-  }else {
+  } else {
     res.send("FAIL")
   }
 });

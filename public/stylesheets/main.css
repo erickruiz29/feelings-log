@@ -136,6 +136,10 @@ input[type="text"]:focus {
     padding-bottom: 10pt;
 }
 
+#music.closeableContainer.nomusic {
+    background-color: #b3b3b3;
+}
+
 #music h3 {
     font-size: 25pt;
     font-weight: 280;

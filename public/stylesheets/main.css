@@ -10,6 +10,13 @@ h1 {
     letter-spacing: 5px;
 }
 
+a {
+    font-size: 50pt;
+    text-decoration: none;
+    cursor: pointer;
+    color: #00B7FF;
+}
+
 .lightspaced {
     font-weight: 320;
     letter-spacing: 8pt;
@@ -112,7 +119,7 @@ input[type="text"]:focus {
     background-color: #f3f3f3;
     width: 500pt;
     min-height: 80pt;
-    bottom: 55%;
+    bottom: 900pt;
     padding-left: 235pt;
     padding-top: 20pt;
     padding-bottom: 10pt;
@@ -130,7 +137,7 @@ input[type="text"]:focus {
     background-color: #73c3dc;
     width: 695pt;
     min-height: 80pt;
-    bottom: 55%;
+    bottom: 900pt;
     padding-left: 20pt;
     padding-top: 20pt;
     padding-bottom: 10pt;

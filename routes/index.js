@@ -44,7 +44,7 @@ router.get('/', function(req, res, next) {
 });
 
 function getRelevantTrackData(callback) {
-    var trackData = undefined;
+    var trackData = {};
     if (spotifyEnabled && spotifyApi !== undefined && spotifyApi.getAccessToken() !== undefined) {
         spotifyApi.getMyCurrentPlayingTrack()
             .then(function(data) {
@@ -94,7 +94,7 @@ router.get('/log', function(req, res, next) {
 
     if (spotifyEnabled && spotifyApi !== undefined && spotifyApi.getAccessToken() !== undefined) {
         getRelevantTrackData((trackData) => {
-            if (trackData !== undefined) {
+            if (Object.keys(trackData).length > 0) {
                 if (trackData.error) {
                     args.error = trackData.error;
                 } else {

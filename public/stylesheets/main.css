@@ -150,7 +150,7 @@ input[type="text"]:focus {
     font-weight: 280;
     display: inline-block;
     margin-left: 15pt;
-    width: 70%;
+    width: 60%;
 }
 
 #music img {
@@ -158,5 +158,5 @@ input[type="text"]:focus {
     height: 120pt;
     display: inline;
     vertical-align: middle;
-    padding: 25pt;
+    padding: 25pt 25pt 25pt 50pt;
 }

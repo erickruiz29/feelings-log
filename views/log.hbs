@@ -30,7 +30,9 @@
             spotifyBtn={{{spotifyBtnEnabled}}},
             currentMusic={{{currentMusic}}},
             error={{{error}}},
-            musicImgUrl={{{musicImgUrl}}};
+            musicImgUrl={{{musicImgUrl}}},
+            trackInfoUpdateNum = 0,
+            numTrackUpdates = 0;
 
         function zoomOutMobile() {
             var viewport = document.querySelector('meta[name="viewport"]');
@@ -65,13 +67,31 @@
             $.ajax({
                 url: "/getTrackData"
             }).done(function(trackData) {
-                music.find("img").attr("src", `${trackData.image.url}`)
-                music.find("h3").text(`${trackData.name} by ${trackData.artists[0].name}`)
+                console.log("Update trackData");
+                console.log(numTrackUpdates);
+                console.log(trackData);
 
-                if (typeof callback === "function") {
-                    callback()
+                if (spotifyBtn === true) {
+                    return;
                 }
-                music.attr("style", "")
+
+                if (!$.isEmptyObject(trackData)) {
+                    var img = music.find("img");
+                    img.attr("src", `${trackData.image.url}`)
+                    music.find("h3").text(`${trackData.name} by ${trackData.artists[0].name}`)
+                    music.removeClass("nomusic");
+
+                    if (typeof callback === "function") {
+                        callback()
+                    }
+                    img.attr("style", "");
+                    music.attr("style", "")
+                } else {
+                    setupNoMusic("", "No music playing")
+                    if (typeof callback === "function") {
+                        callback()
+                    }
+                }
             }).error(() => {
                 if (typeof callback === "function") {
                     callback()
@@ -142,7 +162,7 @@
 
             let  maxTry = 0;
             let intFn = setInterval(function() {
-                if (maxTry >= 20) {
+                if (maxTry >= 8) {
                     clearInterval(intFn);
                     updateText("No service")
                 } else {
@@ -180,16 +200,24 @@
 
 
         function initMusicIntervalFn() {
-            let numTrackUpdates = 0;
-            let trackInfoUpdateNum = setInterval(() => {
-                if (numTrackUpdates > 6) {
+            if (spotifyBtn === true) {
+                return;
+            }
+            trackInfoUpdateNum = setInterval(() => {
+                if (numTrackUpdates > 10) {
                     clearInterval(trackInfoUpdateNum);
                     // window.location.refresh()
                 }
                 updateTrackData( () => {
                     numTrackUpdates += 1
                 })
-            }, 2000)
+            }, 5000)
+        }
+
+        function setupNoMusic(mus, url) {
+            music.addClass("nomusic");
+            music.html(`<img style="opacity: 0;" src="${mus}"><h3>${url}</h3>`);
+            music.attr("style", "");
         }
 
         // Business Logic start
@@ -208,26 +236,18 @@
                 }, 2000);
             }
 
-            if (spotifyBtn === true) {
-                auth.attr("style", "");
-            }
-
             if (error !== "") {
                 music.append(`<h3>${error}</h3>`);
                 music.attr("style", "");
+            } else if (spotifyBtn === true) {
+                auth.attr("style", "");
             } else if (currentMusic === "No music playing") {
-                music.addClass("nomusic");
-                music.append(`<h3>${currentMusic}</h3>`);
-                music.attr("style", "");
-                setTimeout(() => {
-                    music.attr("style", "opacity: 0;");
-                    initMusicIntervalFn()
-                }, 2000)
+                setupNoMusic(musicImgUrl, currentMusic)
             } else if (currentMusic !== "") {
                 music.append(`<img src="${musicImgUrl}"><h3>${currentMusic}</h3>`);
                 music.attr("style", "");
-                initMusicIntervalFn()
             }
+            initMusicIntervalFn()
         }
 
         startApp();

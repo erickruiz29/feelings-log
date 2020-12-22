@@ -41,39 +41,6 @@
             }
         }
 
-        reset(0);
-
-
-        var url = new URL(window.location.href);
-        var isTest = url.searchParams.get("test");
-
-        if (authd !== "" && !spotifyBtn) {
-            hints.text(`${authd} has been authorized!`);
-            hints.attr("style", "opacity: 1;");
-            setTimeout(() => {
-                hints.attr("style", "opacity: 0;");
-            }, 2000);
-        }
-
-        if (spotifyBtn === true) {
-            auth.attr("style", "");
-        }
-
-        if (error !== "") {
-            music.append(`<h3>${error}</h3>`);
-            music.attr("style", "");
-        } else if (currentMusic === "No music playing") {
-            music.addClass("nomusic");
-            music.append(`<img src="${musicImgUrl}"><h3>${currentMusic}</h3>`);
-            music.attr("style", "");
-            setTimeout(() => {
-                music.attr("style", "opacity: 0;");
-            }, 2000)
-        } else if (currentMusic !== "") {
-            music.append(`<img src="${musicImgUrl}"><h3>${currentMusic}</h3>`);
-            music.attr("style", "");
-        }
-
         function message(msg) {
             let style = "line-height: 36px; opacity: 1;";
             if (msg === "FAIL" || msg === "ERROR") {
@@ -103,8 +70,8 @@
 
                 if (typeof callback === "function") {
                     callback()
-                    music.attr("style", "")
                 }
+                music.attr("style", "")
             }).error(() => {
                 if (typeof callback === "function") {
                     callback()
@@ -166,8 +133,8 @@
             transitionOut()
 
             let name=$("#name").val(),
-                feel=$("#feel").val(),
-                emoji=$("#emoji").val();
+                    feel=$("#feel").val(),
+                    emoji=$("#emoji").val();
 
             if (name === "") {
                 name = "Erick"
@@ -210,5 +177,59 @@
         });
 
         $("form").submit(function(ev) { submitForm(ev) });
+
+
+        function initMusicIntervalFn() {
+            let numTrackUpdates = 0;
+            let trackInfoUpdateNum = setInterval(() => {
+                if (numTrackUpdates > 6) {
+                    clearInterval(trackInfoUpdateNum);
+                    // window.location.refresh()
+                }
+                updateTrackData( () => {
+                    numTrackUpdates += 1
+                })
+            }, 2000)
+        }
+
+        // Business Logic start
+
+        function startApp() {
+            reset(0);
+
+            var url = new URL(window.location.href);
+            var isTest = url.searchParams.get("test");
+
+            if (authd !== "" && !spotifyBtn) {
+                hints.text(`${authd} has been authorized!`);
+                hints.attr("style", "opacity: 1;");
+                setTimeout(() => {
+                    hints.attr("style", "opacity: 0;");
+                }, 2000);
+            }
+
+            if (spotifyBtn === true) {
+                auth.attr("style", "");
+            }
+
+            if (error !== "") {
+                music.append(`<h3>${error}</h3>`);
+                music.attr("style", "");
+            } else if (currentMusic === "No music playing") {
+                music.addClass("nomusic");
+                music.append(`<h3>${currentMusic}</h3>`);
+                music.attr("style", "");
+                setTimeout(() => {
+                    music.attr("style", "opacity: 0;");
+                    initMusicIntervalFn()
+                }, 2000)
+            } else if (currentMusic !== "") {
+                music.append(`<img src="${musicImgUrl}"><h3>${currentMusic}</h3>`);
+                music.attr("style", "");
+                initMusicIntervalFn()
+            }
+        }
+
+        startApp();
     });
 </script>

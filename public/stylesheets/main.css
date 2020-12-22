@@ -117,9 +117,9 @@ input[type="text"]:focus {
     right: 0;
     font-size: 50pt;
     background-color: #f3f3f3;
-    width: 500pt;
+    width: 90%;
     min-height: 80pt;
-    bottom: 900pt;
+    bottom: 0;
     padding-left: 235pt;
     padding-top: 20pt;
     padding-bottom: 10pt;
@@ -135,12 +135,10 @@ input[type="text"]:focus {
     left: 0;
     font-size: 50pt;
     background-color: #73c3dc;
-    width: 695pt;
+    width: 100%;
     min-height: 80pt;
-    bottom: 900pt;
-    padding-left: 20pt;
-    padding-top: 20pt;
-    padding-bottom: 10pt;
+    bottom: 0;
+    padding: 0;
 }
 
 #music.closeableContainer.nomusic {
@@ -148,16 +146,17 @@ input[type="text"]:focus {
 }
 
 #music h3 {
-    font-size: 25pt;
+    font-size: 30pt;
     font-weight: 280;
     display: inline-block;
-    width: 600pt;
-    padding-left: 20pt;
+    margin-left: 15pt;
+    width: 70%;
 }
 
 #music img {
-    width: 60pt;
-    height: 60pt;
-    display: inline-block;
+    width: 120pt;
+    height: 120pt;
+    display: inline;
     vertical-align: middle;
+    padding: 25pt;
 }

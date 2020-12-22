@@ -43,22 +43,66 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Welcome!' });
 });
 
-router.get('/log', function(req, res, next) {
-    console.log(spotifyEnabled)
-    if (spotifyEnabled && spotifyApi !== undefined) {
-        spotifyApi.getMyCurrentPlaybackState()
+function getRelevantTrackData(callback) {
+    var trackData = {}
+    if (spotifyEnabled && spotifyApi !== undefined && spotifyApi.getAccessToken() !== undefined) {
+        spotifyApi.getMyCurrentPlayingTrack()
             .then(function(data) {
-                // Output items
                 if (data.body && data.body.is_playing) {
-                    console.log("User is currently playing something!");
-                } else {
-                    console.log("User is not playing anything, or doing so in private.");
+                    // console.log(data.body.item.album);
+                    trackData = {
+                        id: data.body.item.id,
+                            preview_url: data.body.item.preview_url,
+                        artists: data.body.item.artists,
+                        progress_ms: data.body.item.progress_ms,
+                        duration_ms: data.body.item.duration_ms,
+                        name: data.body.item.name,
+                        external_urls: data.body.item.external_urls,
+                        image: data.body.item.album.images[0]
+                    }
+
+                    if (typeof callback === "function") {
+                        callback(trackData)
+                    } else {
+                        return trackData
+                    }
                 }
             }, function(err) {
-                console.log('Something went wrong!', err);
+                return {error: `"Error with Spotify"`}
             });
     }
-  res.render('log', { title: 'Feelings Log', test: req.get("test") === "true" });
+}
+
+router.get('/getTrackData', (req, res, next) => {
+    getRelevantTrackData((trackData) => {
+        res.json(trackData)
+    })
+})
+
+router.get('/log', function(req, res, next) {
+    var authd = req.query["authd"];
+    authd = authd === undefined ? `""` : `"${authd}"`;
+
+    let spotifyBtnEnabled = false;
+    let currentMusic = `""`
+    let args = { title: 'Feelings Log', test: req.get("test") === "true", authd: authd,
+        spotifyBtnEnabled: spotifyBtnEnabled, currentMusic: currentMusic, error: `""`, musicImgUrl: `""`};
+
+    if (spotifyEnabled && spotifyApi !== undefined && spotifyApi.getAccessToken() !== undefined) {
+        getRelevantTrackData((trackData) => {
+            if (trackData.error) {
+                args.error = trackData.error;
+            } else {
+                args.currentMusic = `"${trackData.name} by ${trackData.artists[0].name}"`;
+                args.musicImgUrl = `"${trackData.image.url}"`
+                args.spotifyBtnEnabled = `"false"`;
+            }
+            res.render('log', args);
+        })
+    } else {
+        args.spotifyBtnEnabled = `${spotifyEnabled}`
+        res.render('log', args);
+    }
 });
 
 router.post('/log', function (req, res, next) {
@@ -120,7 +164,8 @@ router.get('/callback/spotify', (req, res) => {
             console.log(
                 `Sucessfully retreived access token. Expires in ${expires_in} s.`
             );
-            res.send('Success! You can now close the window.');
+
+            res.redirect('/log?authd=Spotify');
 
             setInterval(async () => {
                 const data = await spotifyApi.refreshAccessToken();

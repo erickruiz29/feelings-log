@@ -15,17 +15,47 @@
 <div class="container response">
     <div id="response" style="opacity: 0;">&nbsp;</div>
 </div>
-<div class="container"></div>
+<div id="auth" style="display: none;" class="closeableContainer"><a class="closeable" href="/auth/spotify">Authorize Spotify</a></div>
+<div id="music" style="display: none;" class="closeableContainer"></div>
 
 <script type="application/javascript">
     $(function (){
         let out = $("#response"),
             hints=$("#hints"),
             title=$("#title"),
-            action=$("#action");
+            action=$("#action"),
+            auth=$("#auth"),
+            music=$("#music"),
+            authd={{{authd}}},
+            spotifyBtn={{{spotifyBtnEnabled}}},
+            currentMusic={{{currentMusic}}},
+            error={{{error}}},
+            musicImgUrl={{{musicImgUrl}}};
+
+        reset(0);
 
         var url = new URL(window.location.href);
         var isTest = url.searchParams.get("test");
+
+        if (authd !== "" && !spotifyBtn) {
+            hints.text(`${authd} has been authorized!`);
+            hints.attr("style", "opacity: 1;");
+            setTimeout(() => {
+                hints.attr("style", "opacity: 0;");
+            }, 2000);
+        }
+
+        if (spotifyBtn === true) {
+            auth.attr("style", "");
+        }
+
+        if (currentMusic !== "") {
+            music.append(`<img src="${musicImgUrl}"><h3>${currentMusic}</h3>`);
+            music.attr("style", "");
+        } else if (error !== "") {
+            music.append(`<h3>${error}</h3>`);
+            music.attr("style", "");
+        }
 
         function message(msg) {
             let style = "line-height: 36px; opacity: 1;";
@@ -47,6 +77,24 @@
             out.html("&nbsp;")
         }
 
+        function updateTrackData(callback) {
+            $.ajax({
+                url: "/getTrackData"
+            }).done(function(trackData) {
+                music.find("img").attr("src", `${trackData.image.url}`)
+                music.find("h3").text(`${trackData.name} by ${trackData.artists[0].name}`)
+
+                if (typeof callback === "function") {
+                    callback()
+                    music.attr("style", "")
+                }
+            }).error(() => {
+                if (typeof callback === "function") {
+                    callback()
+                }
+            });
+        }
+
         function reset(time) {
             setTimeout(function() {
                 clear()
@@ -62,8 +110,26 @@
             }, time)
         }
 
+        function resetUpdateTrack(time) {
+            setTimeout(function() {
+                updateTrackData(()=> {
+                    clear()
+                    $("#name").val("")
+                    $("#feel").val("")
+                    $("#emoji").val("")
+                    $("#formContainer").attr("")
+                    $("form").attr("style", "")
+                    hints.html("&nbsp;")
+                    hints.attr("style", "")
+                    action.attr("style", "opacity: 0;");
+                    title.attr("style", "opacity: 1;");
+                });
+            }, time)
+        }
+
         function transitionOut() {
             $("#formContainer").attr("style","max-height: 0;");
+            music.attr("style", "opacity: 0;")
             $("form").attr("style", "opacity: 0;");
             hints.attr("style", "opacity: 0;");
             action.attr("style", "opacity: 1;");
@@ -73,7 +139,7 @@
         function updateText(msg) {
             action.attr("style", "opacity: 0;")
             message(msg)
-            reset(2500)
+            resetUpdateTrack(2500)
         }
 
         function submitForm(ev) {
@@ -104,9 +170,9 @@
                 setTimeout(function() {
                     clearInterval(intFn);
                     if(data === 'CREATED!') {
-                        updateText("Feeling saved")
+                        updateText("Data point saved")
                     } else {
-                        updateText("No save")
+                        updateText("No point saved")
                     }
                 }, 2300)
             });
